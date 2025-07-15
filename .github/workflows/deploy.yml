@@ -24,6 +24,23 @@ jobs:
     - name: Build project
       run: npm run build
       
+    - name: Debug secrets
+      run: |
+        echo "Checking if secrets exist..."
+        if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then
+          echo "❌ SSH_PRIVATE_KEY secret is empty or missing"
+          exit 1
+        else
+          echo "✅ SSH_PRIVATE_KEY secret exists"
+        fi
+
+        if [ -z "${{ secrets.SSH_KNOWN_HOSTS }}" ]; then
+          echo "❌ SSH_KNOWN_HOSTS secret is empty or missing"
+          exit 1
+        else
+          echo "✅ SSH_KNOWN_HOSTS secret exists"
+        fi
+
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
@@ -33,7 +50,8 @@ jobs:
 
     - name: Test SSH connection
       run: |
-        ssh -o StrictHostKeyChecking=no root@46.202.163.122 'echo "SSH connection successful"'
+        echo "Testing SSH connection..."
+        ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@46.202.163.122 'echo "SSH connection successful"'
 
     - name: Deploy to VPS
       run: |
