@@ -2,6 +2,8 @@
 
 A modern, responsive website built with React and Vite for Brain Logic Info Solutions, showcasing professional IT services including Magento, ReactJS, Angular, .NET, Java, and Python development with GraphQL expertise.
 
+🚀 **Auto-deployment is now active!** Every push to main branch automatically deploys to https://brainlogic.in
+
 ## 🚀 Features
 
 - **Modern Design**: Clean, professional UI with latest IT industry color trends
