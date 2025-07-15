@@ -29,17 +29,22 @@ jobs:
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-        
+        if_key_exists: replace
+
+    - name: Test SSH connection
+      run: |
+        ssh -o StrictHostKeyChecking=no root@46.202.163.122 'echo "SSH connection successful"'
+
     - name: Deploy to VPS
       run: |
         # Deploy frontend
-        rsync -avz --delete dist/ root@46.202.163.122:/var/www/brainlogic/html/
-        
+        rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" dist/ root@46.202.163.122:/var/www/brainlogic/html/
+
         # Deploy backend (excluding node_modules and .env)
-        rsync -avz --exclude='node_modules' --exclude='.env' backend/ root@46.202.163.122:/var/www/brainlogic/backend/
-        
+        rsync -avz --exclude='node_modules' --exclude='.env' -e "ssh -o StrictHostKeyChecking=no" backend/ root@46.202.163.122:/var/www/brainlogic/backend/
+
         # Restart backend service
-        ssh root@46.202.163.122 'cd /var/www/brainlogic/backend && npm install && pm2 restart brainlogic-api || pm2 start server.js --name brainlogic-api'
-        
+        ssh -o StrictHostKeyChecking=no root@46.202.163.122 'cd /var/www/brainlogic/backend && npm install --production && pm2 restart brainlogic-api || pm2 start server.js --name brainlogic-api'
+
         # Reload Nginx
-        ssh root@46.202.163.122 'systemctl reload nginx'
+        ssh -o StrictHostKeyChecking=no root@46.202.163.122 'systemctl reload nginx'
