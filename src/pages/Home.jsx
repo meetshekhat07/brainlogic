@@ -1,480 +1,511 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 
-const Home = () => {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(true);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const dynamicTexts = [
-    "Digital Reality",
-    "Innovative Solutions",
-    "Modern Experiences",
-    "Business Success",
-    "Digital Innovation",
-    "Tech Excellence"
-  ];
+/* ─── Animated Counter ────────────────────────────────────────── */
+const Counter = ({ target, suffix = '' }) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsTyping(false);
-      setTimeout(() => {
-        setCurrentTextIndex((prev) => (prev + 1) % dynamicTexts.length);
-        setIsTyping(true);
-      }, 500);
-    }, 2500);
+    if (!inView) return;
+    const end = parseInt(target, 10);
+    const duration = 1800;
+    const step = Math.ceil(end / (duration / 16));
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, end);
+      setCount(current);
+      if (current >= end) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [inView, target]);
 
-    return () => clearInterval(interval);
-  }, []);
+  return <span ref={ref}>{count}{suffix}</span>;
+};
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+/* ─── Marquee data ────────────────────────────────────────────── */
+const techItems = [
+  'Magento 2', 'Adobe Commerce', 'React.js', 'Angular', 'Node.js',
+  'MySQL', 'AWS', 'PHP', 'TypeScript', 'GraphQL',
+  'Elasticsearch', 'Redis', 'Docker', 'Tailwind CSS', 'Figma',
+  'PWA', 'REST API', 'Shopify', 'WooCommerce', 'Stripe',
+];
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+/* ─── Services data ───────────────────────────────────────────── */
+const otherServices = [
+  {
+    icon: '⚛️',
+    color: 'cyan',
+    title: 'ReactJS Development',
+    desc: 'Fast, interactive UIs with React 18+, hooks, and modern state management.',
+    href: '/services/react',
+  },
+  {
+    icon: '⚡',
+    color: 'purple',
+    title: 'Angular Development',
+    desc: 'Enterprise-grade SPAs with Angular 17+, TypeScript, and RxJS.',
+    href: '/services/angular',
+  },
+  {
+    icon: '🎨',
+    color: 'orange',
+    title: 'UI/UX Design',
+    desc: 'Pixel-perfect, conversion-focused designs crafted in Figma.',
+    href: '/services/uiux',
+  },
+  {
+    icon: '☕',
+    color: 'green',
+    title: 'Java Development',
+    desc: 'Robust backend systems with Spring Boot and microservices.',
+    href: '/services/java',
+  },
+  {
+    icon: '🐍',
+    color: 'cyan',
+    title: 'Python Development',
+    desc: 'AI/ML pipelines, automation, and Django/FastAPI backends.',
+    href: '/services/python',
+  },
+];
 
-  const services = [
-    {
-      name: 'Magento',
-      description: 'Powerful eCommerce solutions with custom Magento development',
-      icon: '🛒',
-      link: '/services/magento'
-    },
-    {
-      name: 'Angular',
-      description: 'Modern web applications with Angular 17+ framework and TypeScript',
-      icon: '⚡',
-      link: '/services/angular'
-    },
-    {
-      name: 'ReactJS',
-      description: 'Modern, interactive user interfaces with React',
-      icon: '⚛️',
-      link: '/services/react'
-    },
-    {
-      name: 'UI/UX Design',
-      description: 'Beautiful, intuitive user interfaces and exceptional user experiences that engage and convert',
-      icon: '🎨',
-      link: '/services/uiux'
-    },
-    {
-      name: 'Java',
-      description: 'Scalable backend solutions with Java technologies',
-      icon: '☕',
-      link: '/services/java'
-    },
-    {
-      name: 'Python',
-      description: 'AI/ML solutions and web development with Python',
-      icon: '🐍',
-      link: '/services/python'
-    }
-  ];
+/* ─── Why Choose Us ───────────────────────────────────────────── */
+const reasons = [
+  { icon: '🏆', title: 'Magento Experts',       desc: '5+ years of dedicated Magento 2 & Adobe Commerce experience.' },
+  { icon: '🌍', title: 'Global Clients',         desc: 'Serving clients across USA, UK, Australia, Europe, and Middle East.' },
+  { icon: '⚡', title: 'On-Time Delivery',       desc: 'Agile sprints ensure your project ships on schedule, every time.' },
+  { icon: '💰', title: 'Competitive Pricing',    desc: 'Premium quality at India-competitive pricing — best of both worlds.' },
+  { icon: '🔒', title: 'Secure & Scalable',      desc: 'PCI-DSS compliant, performance-tuned stores that grow with you.' },
+  { icon: '🛠️', title: '24/7 Support',           desc: 'Dedicated post-launch maintenance and round-the-clock assistance.' },
+];
 
-  const stats = [
-    { number: '100+', label: 'Projects Completed' },
-    { number: '50+', label: 'Happy Clients' },
-    { number: '5+', label: 'Years Experience' },
-    { number: '24/7', label: 'Support Available' }
-  ];
+/* ─── Process ─────────────────────────────────────────────────── */
+const steps = [
+  { num: '01', title: 'Discovery',    desc: 'We study your business goals, audience, and competitors.' },
+  { num: '02', title: 'Planning',     desc: 'Detailed roadmap with milestones, stack selection, and estimates.' },
+  { num: '03', title: 'Design',       desc: 'Wireframes, prototypes, and pixel-perfect UI handoff.' },
+  { num: '04', title: 'Development',  desc: 'Agile sprints with daily updates and code reviews.' },
+  { num: '05', title: 'Launch',       desc: 'Rigorous QA, performance audit, then smooth deployment.' },
+];
 
-  return (
-    <div className="home">
-      {/* Hero Section */}
-      <section
-        className="hero interactive-hero"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Interactive Background Elements */}
-        <div className="hero-background">
+/* ─── Testimonials ────────────────────────────────────────────── */
+const testimonials = [
+  {
+    stars: '★★★★★',
+    quote: 'Brain Logic transformed our Magento store completely. Revenue jumped 40% in 3 months after launch. Exceptional team!',
+    name: 'James Mitchell',
+    role: 'CEO, RetailTech USA',
+    avatar: 'JM',
+  },
+  {
+    stars: '★★★★★',
+    quote: 'Outstanding Magento 2 migration from M1. Zero downtime, faster load times, and the checkout conversion rate tripled.',
+    name: 'Sarah O\'Brien',
+    role: 'eCommerce Director, FashionHub UK',
+    avatar: 'SO',
+  },
+  {
+    stars: '★★★★★',
+    quote: 'Best offshore Magento team we\'ve worked with. Communication is top-notch and the code quality is enterprise-level.',
+    name: 'Arjun Mehta',
+    role: 'CTO, NexaCommerce India',
+    avatar: 'AM',
+  },
+];
+
+/* ─── fade-up animation variant ──────────────────────────────── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
+
+/* ═══════════════════════════════════════════════════════════════ */
+const Home = () => (
+  <div>
+
+    {/* ── HERO ─────────────────────────────────────────────────── */}
+    <section className="hero-section">
+      <div className="hero-bg-gradient" />
+      <div className="hero-grid-overlay" />
+      <div className="hero-orb hero-orb-1" />
+      <div className="hero-orb hero-orb-2" />
+      <div className="hero-orb hero-orb-3" />
+
+      <div className="container">
+        <div className="hero-inner">
+          {/* Text */}
           <motion.div
-            className="bg-particle"
-            animate={{
-              x: mousePosition.x * 0.02,
-              y: mousePosition.y * 0.02,
-            }}
-            transition={{ type: "spring", stiffness: 50 }}
-          />
-          <motion.div
-            className="bg-particle"
-            animate={{
-              x: mousePosition.x * -0.01,
-              y: mousePosition.y * -0.01,
-            }}
-            transition={{ type: "spring", stiffness: 30 }}
-          />
-          <motion.div
-            className="bg-particle"
-            animate={{
-              x: mousePosition.x * 0.015,
-              y: mousePosition.y * -0.015,
-            }}
-            transition={{ type: "spring", stiffness: 40 }}
-          />
-        </div>
-
-        <div className="container">
-          <div className="hero-content">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="hero-text"
-            >
-              <motion.h1
-                className="hero-title"
-                animate={{
-                  scale: isHovered ? 1.02 : 1,
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.span
-                  animate={{
-                    backgroundPosition: isHovered ? "200% center" : "0% center",
-                  }}
-                  transition={{ duration: 2, repeat: isHovered ? Infinity : 0 }}
-                  className="animated-text"
-                >
-                  Transforming Ideas into
-                </motion.span>
-                <motion.span
-                  key={currentTextIndex}
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{
-                    opacity: isTyping ? 1 : 0,
-                    y: isTyping ? 0 : -20,
-                    scale: isTyping ? 1 : 0.8
-                  }}
-                  transition={{ duration: 0.5, type: "spring" }}
-                  className="gradient-text dynamic-text"
-                >
-                  {" " + dynamicTexts[currentTextIndex]}
-                </motion.span>
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="hero-description"
-              >
-                Brain Logic Info Solutions is your trusted partner for cutting-edge web development,
-                UI/UX design, and enterprise software solutions. We specialize in modern
-                technologies and exceptional user experiences to bring your vision to life.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="hero-buttons"
-              >
-                <motion.div
-                  whileHover={{
-                    scale: 1.05,
-                    rotate: [0, -1, 1, 0],
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Link to="/contact" className="btn-primary interactive-btn magnetic-btn">
-                    <motion.span
-                      animate={{
-                        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                      }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    >
-                      Get Started
-                    </motion.span>
-                    <motion.span
-                      className="btn-arrow"
-                      initial={{ x: 0 }}
-                      whileHover={{ x: 8, scale: 1.2 }}
-                      transition={{ duration: 0.2, type: "spring" }}
-                    >
-                      →
-                    </motion.span>
-                  </Link>
-                </motion.div>
-                <motion.div
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 10px 30px rgba(0, 102, 204, 0.3)"
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Link to="/portfolio" className="btn-secondary interactive-btn pulse-btn">
-                    <span>View Our Work</span>
-                    <motion.div
-                      className="btn-ripple"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 0, 0.5],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  </Link>
-                </motion.div>
-              </motion.div>
-
-              {/* Interactive Stats */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.9 }}
-                className="hero-stats"
-              >
-                <motion.div
-                  className="hero-stat"
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, -5, 5, 0],
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="stat-number"
-                    animate={{
-                      textShadow: isHovered ? "0 0 20px rgba(0, 102, 204, 0.5)" : "none"
-                    }}
-                  >
-                    100+
-                  </motion.span>
-                  <span className="stat-label">Projects</span>
-                </motion.div>
-                <motion.div
-                  className="hero-stat"
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, 5, -5, 0],
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="stat-number"
-                    animate={{
-                      textShadow: isHovered ? "0 0 20px rgba(0, 102, 204, 0.5)" : "none"
-                    }}
-                  >
-                    50+
-                  </motion.span>
-                  <span className="stat-label">Clients</span>
-                </motion.div>
-                <motion.div
-                  className="hero-stat"
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, -3, 3, 0],
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="stat-number"
-                    animate={{
-                      textShadow: isHovered ? "0 0 20px rgba(0, 102, 204, 0.5)" : "none"
-                    }}
-                  >
-                    5+
-                  </motion.span>
-                  <span className="stat-label">Years</span>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="hero-visual"
-            >
-              <div className="hero-graphic">
-                <motion.div
-                  className="floating-card"
-                  animate={{
-                    y: [0, -10, 0],
-                    rotate: [0, 2, 0]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, -5, 5, 0],
-                    y: -15,
-                    boxShadow: "0 20px 50px rgba(0, 102, 204, 0.4)",
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="tech-icon"
-                    whileHover={{
-                      scale: 1.3,
-                      rotate: 360,
-                      transition: { duration: 0.5 }
-                    }}
-                  >
-                    💻
-                  </motion.span>
-                  <span>Web Development</span>
-                </motion.div>
-                <motion.div
-                  className="floating-card"
-                  animate={{
-                    y: [0, -15, 0],
-                    rotate: [0, -2, 0]
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, 8, -8, 0],
-                    y: -18,
-                    boxShadow: "0 25px 60px rgba(99, 102, 241, 0.4)",
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="tech-icon"
-                    whileHover={{
-                      scale: 1.4,
-                      rotate: [0, 180, 360],
-                      transition: { duration: 0.6 }
-                    }}
-                  >
-                    🎨
-                  </motion.span>
-                  <span>UI/UX Design</span>
-                </motion.div>
-                <motion.div
-                  className="floating-card"
-                  animate={{
-                    y: [0, -12, 0],
-                    rotate: [0, 3, 0]
-                  }}
-                  transition={{
-                    duration: 3.5,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 2
-                  }}
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: [0, -10, 10, 0],
-                    y: -20,
-                    boxShadow: "0 30px 70px rgba(0, 212, 255, 0.4)",
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span
-                    className="tech-icon"
-                    whileHover={{
-                      scale: 1.5,
-                      y: [0, -10, 0],
-                      transition: { duration: 0.4, repeat: 2 }
-                    }}
-                  >
-                    🚀
-                  </motion.span>
-                  <span>Enterprise Solutions</span>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="services-preview section-padding">
-        <div className="container">
-          <div className="section-header text-center">
-            <h2>Our Expertise</h2>
-            <p>We specialize in cutting-edge technologies to deliver exceptional results</p>
-          </div>
-          <div className="services-grid">
-            {services.map((service, index) => (
-              <motion.div
-                key={service.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="service-card"
-              >
-                <div className="service-icon">{service.icon}</div>
-                <h3>{service.name}</h3>
-                <p>{service.description}</p>
-                <Link to={service.link} className="service-link">
-                  Learn More →
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="stats-section">
-        <div className="container">
-          <div className="stats-grid">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="stat-item"
-              >
-                <div className="stat-number gradient-text">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="cta-section section-padding">
-        <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="cta-content text-center"
+            initial="hidden"
+            animate="show"
+            variants={stagger}
           >
-            <h2>Ready to Start Your Next Project?</h2>
-            <p>
-              Let's discuss how we can help transform your ideas into powerful digital solutions. 
-              Our team of experts is ready to bring your vision to life.
-            </p>
-            <div className="cta-buttons">
+            <motion.div variants={fadeUp} className="hero-badge">
+              <span className="hero-badge-dot" />
+              🏆 Magento Certified Experts · Ahmedabad, India
+            </motion.div>
+
+            <motion.h1 variants={fadeUp} className="hero-h1">
+              Build Powerful{' '}
+              <span className="gradient-text">eCommerce&nbsp;Stores</span>{' '}
+              That Convert
+            </motion.h1>
+
+            <motion.p variants={fadeUp} className="hero-desc">
+              We are Brain Logic Info Solutions — Ahmedabad's leading Magento & eCommerce
+              development agency. From custom Magento 2 builds to Adobe Commerce
+              Enterprise, we craft stores that scale globally and sell relentlessly.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="hero-actions">
               <Link to="/contact" className="btn-primary">
-                Start Your Project
+                Start Your Project →
               </Link>
-              <Link to="/about" className="btn-secondary">
-                Learn About Us
+              <Link to="/services/magento" className="btn-outline">
+                Our Magento Services
               </Link>
+            </motion.div>
+
+            <motion.div variants={fadeUp} className="hero-stats-row">
+              {[
+                { num: 100, suffix: '+', label: 'Projects Delivered' },
+                { num: 50,  suffix: '+', label: 'Happy Clients' },
+                { num: 5,   suffix: '+', label: 'Years Experience' },
+                { num: 24,  suffix: '/7', label: 'Support' },
+              ].map(s => (
+                <div key={s.label} className="hero-stat">
+                  <span className="hero-stat-num">
+                    <Counter target={s.num} suffix={s.suffix} />
+                  </span>
+                  <span className="hero-stat-label">{s.label}</span>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* Floating visual */}
+          <motion.div
+            className="hero-visual"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <div className="hero-float-grid">
+              <div className="hf-card hf-card-1">
+                <span className="hf-icon">🛒</span>
+                <div className="hf-title">Magento 2</div>
+                <div className="hf-sub">Adobe Commerce Expert</div>
+              </div>
+              <div className="hf-card hf-card-2">
+                <span className="hf-num">+40%</span>
+                <div className="hf-title">Avg. Revenue Lift</div>
+                <div className="hf-sub">After store migration</div>
+              </div>
+              <div className="hf-card hf-card-3">
+                <span className="hf-icon">⚡</span>
+                <div className="hf-title">Performance First</div>
+                <div className="hf-sub">Core Web Vitals optimized</div>
+              </div>
             </div>
           </motion.div>
         </div>
-      </section>
+      </div>
+    </section>
+
+    {/* ── MARQUEE ───────────────────────────────────────────────── */}
+    <div className="marquee-section">
+      <div className="marquee-track">
+        {[...techItems, ...techItems].map((item, i) => (
+          <span key={i} className="marquee-item">
+            <span className="marquee-dot" />
+            {item}
+          </span>
+        ))}
+      </div>
     </div>
-  );
-};
+
+    {/* ── SERVICES ─────────────────────────────────────────────── */}
+    <section className="section-pad">
+      <div className="container">
+        <motion.div
+          initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          className="text-center"
+          style={{ marginBottom: '52px' }}
+        >
+          <motion.span variants={fadeUp} className="eyebrow">Our Expertise</motion.span>
+          <motion.h2 variants={fadeUp}>
+            eCommerce & Web <span className="gradient-text">Development Services</span>
+          </motion.h2>
+          <motion.p variants={fadeUp} style={{ maxWidth: 560, margin: '12px auto 0' }}>
+            From Magento 2 custom development to full-stack web apps — we cover the
+            entire digital commerce spectrum.
+          </motion.p>
+        </motion.div>
+
+        {/* Magento hero card */}
+        <motion.div
+          className="services-hero-card"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="shc-left">
+            <div className="shc-icon">🛒</div>
+            <div>
+              <span className="chip chip-orange" style={{ marginBottom: 12 }}>Primary Service</span>
+              <h3 style={{ marginBottom: 10 }}>Magento 2 & Adobe Commerce Development</h3>
+              <p style={{ fontSize: '0.95rem', lineHeight: 1.75 }}>
+                We are Ahmedabad's most trusted Magento development partner. Whether you
+                need a greenfield Magento 2 build, a M1→M2 migration, custom extension
+                development, or performance tuning — our certified team delivers it
+                all with production-grade quality.
+              </p>
+            </div>
+            <ul className="shc-features">
+              {['Custom Magento 2 / Adobe Commerce Development',
+                'Magento Theme & UI Design',
+                'Custom Module & Extension Development',
+                'Magento 1 → Magento 2 Migration',
+                'Performance Optimization & Speed Audit',
+                'Payment Gateway & Third-Party Integrations',
+                'PWA Storefront (Venia / Custom)',
+                'Magento SEO & Conversion Rate Optimization',
+              ].map(f => <li key={f}>{f}</li>)}
+            </ul>
+            <Link to="/services/magento" className="btn-primary" style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+              Explore Magento Services →
+            </Link>
+          </div>
+          <div className="shc-right">
+            {[
+              { num: '100+', label: 'Magento Projects' },
+              { num: '50+',  label: 'Global Clients' },
+              { num: '5★',   label: 'Client Rating' },
+              { num: '48h',  label: 'Free Audit Turnaround' },
+            ].map(m => (
+              <div key={m.label} className="shc-metric">
+                <div className="shc-metric-num">{m.num}</div>
+                <div className="shc-metric-label">{m.label}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Other services */}
+        <motion.div
+          className="services-grid-3"
+          initial="hidden" whileInView="show" viewport={{ once: true }}
+          variants={stagger}
+        >
+          {otherServices.map(svc => (
+            <motion.div key={svc.title} className="svc-card" variants={fadeUp}>
+              <div className={`svc-card-icon ${svc.color}`}>{svc.icon}</div>
+              <h4>{svc.title}</h4>
+              <p>{svc.desc}</p>
+              <Link to={svc.href} className="svc-card-link">
+                Learn More <span>→</span>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+
+    {/* ── STATS ────────────────────────────────────────────────── */}
+    <div className="stats-section">
+      <div className="container">
+        <motion.div
+          className="stats-grid"
+          initial="hidden" whileInView="show" viewport={{ once: true }}
+          variants={stagger}
+        >
+          {[
+            { num: 100, suffix: '+', label: 'Projects Delivered' },
+            { num: 50,  suffix: '+', label: 'Happy Clients' },
+            { num: 5,   suffix: '+', label: 'Years of Expertise' },
+            { num: 98,  suffix: '%', label: 'Client Retention Rate' },
+          ].map(s => (
+            <motion.div key={s.label} className="stat-box" variants={fadeUp}>
+              <span className="stat-num">
+                <Counter target={s.num} suffix={s.suffix} />
+              </span>
+              <span className="stat-label">{s.label}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+
+    {/* ── WHY CHOOSE US ────────────────────────────────────────── */}
+    <section className="section-pad">
+      <div className="container">
+        <div className="why-grid">
+          {/* Left */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <span className="eyebrow">Why Brain Logic</span>
+            <h2>
+              The Preferred Magento Partner for{' '}
+              <span className="gradient-text">Global Brands</span>
+            </h2>
+            <p style={{ marginTop: 12 }}>
+              Based in Ahmedabad, India — we combine world-class Magento expertise with
+              cost-efficient delivery, making us the go-to choice for startups and
+              enterprises worldwide.
+            </p>
+            <div className="why-features">
+              {reasons.map(r => (
+                <div key={r.title} className="why-feature">
+                  <div className="why-feature-icon">{r.icon}</div>
+                  <div className="why-feature-text">
+                    <h4>{r.title}</h4>
+                    <p>{r.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right visual */}
+          <motion.div
+            className="why-visual"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="why-card-big">
+              <h3>India-Based, <span className="gradient-text">Globally Trusted</span></h3>
+              <p style={{ fontSize: '0.9rem', marginTop: 8 }}>
+                Ahmedabad's time zone gives us an 8–12 hour overlap with US/UK clients,
+                ensuring daily collaboration without the premium agency price tag.
+              </p>
+            </div>
+            <div className="why-cards-row">
+              {[
+                { num: '40%', label: 'Avg. Revenue Increase' },
+                { num: '3x',  label: 'Faster Load Times' },
+                { num: '99%', label: 'Uptime Guarantee' },
+                { num: '48h', label: 'Free Audit' },
+              ].map(c => (
+                <div key={c.label} className="why-mini-card">
+                  <span className="num">{c.num}</span>
+                  <p>{c.label}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+
+    {/* ── PROCESS ──────────────────────────────────────────────── */}
+    <section className="section-pad" style={{ background: 'rgba(255,255,255,0.015)' }}>
+      <div className="container">
+        <motion.div
+          className="text-center"
+          initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        >
+          <motion.span variants={fadeUp} className="eyebrow">How We Work</motion.span>
+          <motion.h2 variants={fadeUp}>Our Proven Development Process</motion.h2>
+          <motion.p variants={fadeUp} style={{ maxWidth: 520, margin: '12px auto 0' }}>
+            A transparent, agile workflow that keeps you informed and in control at every stage.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          className="process-steps"
+          initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        >
+          {steps.map(s => (
+            <motion.div key={s.num} className="process-step" variants={fadeUp}>
+              <div className="process-num">{s.num}</div>
+              <h4>{s.title}</h4>
+              <p>{s.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+
+    {/* ── TESTIMONIALS ─────────────────────────────────────────── */}
+    <section className="section-pad">
+      <div className="container">
+        <motion.div
+          className="text-center"
+          initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        >
+          <motion.span variants={fadeUp} className="eyebrow">Client Testimonials</motion.span>
+          <motion.h2 variants={fadeUp}>
+            Trusted by eCommerce <span className="gradient-text">Leaders Worldwide</span>
+          </motion.h2>
+        </motion.div>
+
+        <motion.div
+          className="testimonials-grid"
+          initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+        >
+          {testimonials.map(t => (
+            <motion.div key={t.name} className="testimonial-card" variants={fadeUp}>
+              <div className="testimonial-stars">{t.stars}</div>
+              <p className="testimonial-quote">"{t.quote}"</p>
+              <div className="testimonial-author">
+                <div className="author-avatar">{t.avatar}</div>
+                <div>
+                  <div className="author-name">{t.name}</div>
+                  <div className="author-role">{t.role}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+
+    {/* ── CTA ──────────────────────────────────────────────────── */}
+    <div className="container">
+      <motion.div
+        className="cta-section"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+      >
+        <div className="cta-inner">
+          <span className="eyebrow" style={{ justifyContent: 'center' }}>Ready to Scale?</span>
+          <h2>
+            Let's Build Your Dream <span className="gradient-text">eCommerce Store</span>
+          </h2>
+          <p>
+            Get a free project audit and consultation from our Magento experts.
+            No commitment, just real actionable insights for your business.
+          </p>
+          <div className="cta-actions">
+            <Link to="/contact" className="btn-primary">
+              Get Free Consultation →
+            </Link>
+            <a
+              href="https://wa.me/917575011974?text=Hi%2C%20I%20need%20Magento%20development%20services"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cta-whatsapp"
+            >
+              💬 Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+
+  </div>
+);
 
 export default Home;

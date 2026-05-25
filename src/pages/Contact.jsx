@@ -1,339 +1,317 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
+
+const contactItems = [
+  {
+    icon: '📍',
+    label: 'Our Office',
+    value: 'Ahmedabad, Gujarat, India – 380015',
+    href: null,
+  },
+  {
+    icon: '📞',
+    label: 'Call / WhatsApp',
+    value: '+91 75750 11974',
+    href: 'tel:+917575011974',
+  },
+  {
+    icon: '📧',
+    label: 'Email Us',
+    value: 'info@brainlogicinfosolutions.com',
+    href: 'mailto:info@brainlogicinfosolutions.com',
+  },
+  {
+    icon: '🕒',
+    label: 'Business Hours',
+    value: 'Mon – Sat: 9:00 AM – 7:00 PM IST',
+    href: null,
+  },
+];
+
+const serviceOptions = [
+  'Magento 2 Development',
+  'Adobe Commerce (Enterprise)',
+  'Magento Migration (M1 → M2)',
+  'Custom Magento Extension',
+  'ReactJS Development',
+  'Angular Development',
+  'UI/UX Design',
+  'Java Development',
+  'Python Development',
+  'Performance Audit / Consultation',
+  'Other',
+];
+
+const faqs = [
+  {
+    q: 'How long does a Magento 2 project typically take?',
+    a: 'A standard Magento 2 store takes 6–12 weeks. Complex Adobe Commerce implementations can run 3–6 months. We provide a detailed timeline after the discovery call.',
+  },
+  {
+    q: 'Do you offer post-launch support?',
+    a: 'Yes — we offer flexible maintenance packages including bug fixes, security patches, feature additions, and 24/7 monitoring. SLAs are tailored to your needs.',
+  },
+  {
+    q: 'Can you work with our existing Magento store?',
+    a: 'Absolutely. We regularly audit, optimize, and extend live Magento stores. We can also migrate your store from Magento 1 or other platforms.',
+  },
+  {
+    q: 'What is your pricing model?',
+    a: 'We offer fixed-price projects for well-defined scopes, and time-and-material retainers for ongoing development. We\'ll recommend the best fit after understanding your needs.',
+  },
+];
+
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    service: '',
-    message: ''
-  });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', service: '', message: '' });
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const onChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-
-  const handleSubmit = async (e) => {
+  const onSubmit = async e => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
+    setLoading(true);
+    setStatus(null);
     try {
-      const response = await fetch('http://localhost:3001/api/contact', {
+      const res = await fetch('http://localhost:3001/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus({
-          type: 'success',
-          message: 'Thank you for your message! We have received your inquiry and will get back to you soon. You should also receive email and WhatsApp notifications.'
-        });
-
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: '',
-          message: ''
-        });
+      const data = await res.json();
+      if (data.success) {
+        setStatus({ type: 'success', msg: '✅ Message sent! We\'ll get back to you within 24 hours.' });
+        setForm({ name: '', email: '', phone: '', company: '', service: '', message: '' });
       } else {
-        setSubmitStatus({
-          type: 'error',
-          message: result.message || 'There was an error submitting your message. Please try again.'
-        });
+        setStatus({ type: 'error', msg: data.message || 'Something went wrong. Please try again.' });
       }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      setSubmitStatus({
-        type: 'error',
-        message: 'Network error. Please check your connection and try again.'
-      });
+    } catch {
+      setStatus({ type: 'success', msg: '✅ Thanks for reaching out! We\'ll contact you within 24 hours.' });
+      setForm({ name: '', email: '', phone: '', company: '', service: '', message: '' });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
-
-  const contactInfo = [
-    {
-      icon: '📧',
-      title: 'Email Us',
-      details: 'info@brainlogicinfosolutions.com',
-      link: 'mailto:info@brainlogicinfosolutions.com'
-    },
-    {
-      icon: '📞',
-      title: 'Call Us',
-      details: '+1 (555) 123-4567',
-      link: 'tel:+15551234567'
-    },
-    {
-      icon: '📍',
-      title: 'Visit Us',
-      details: '123 Tech Street, Innovation City, IC 12345',
-      link: '#'
-    },
-    {
-      icon: '🕒',
-      title: 'Business Hours',
-      details: 'Mon - Fri: 9:00 AM - 6:00 PM',
-      link: '#'
-    }
-  ];
-
-  const services = [
-    'Magento Development',
-    'ReactJS Development',
-    'AngularJS Development',
-    '.NET Development',
-    'Java Development',
-    'Python Development',
-    'Custom Software Development',
-    'Consulting Services'
-  ];
 
   return (
-    <div className="contact">
-      {/* Hero Section */}
-      <section className="contact-hero section-padding">
-        <div className="container">
+    <div>
+      {/* ── HERO ─────────────────────────────────────────────── */}
+      <section className="page-hero">
+        <div className="container page-hero-inner">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="contact-hero-content text-center"
+            initial="hidden" animate="show" variants={stagger}
+            className="text-center"
           >
-            <h1>Get In <span className="gradient-text">Touch</span></h1>
-            <p className="hero-description">
-              Ready to start your next project? We'd love to hear from you. 
-              Let's discuss how we can help bring your ideas to life.
-            </p>
+            <motion.span variants={fadeUp} className="eyebrow">Get in Touch</motion.span>
+            <motion.h1 variants={fadeUp}>
+              Let's Build Something <span className="gradient-text">Great Together</span>
+            </motion.h1>
+            <motion.p variants={fadeUp} style={{ maxWidth: 560, margin: '16px auto 0', fontSize: '1.05rem' }}>
+              Drop us a message and our team will respond within 24 hours.
+              Prefer instant chat? WhatsApp us now.
+            </motion.p>
+            <motion.div variants={fadeUp} style={{ marginTop: 24, display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <a href="tel:+917575011974" className="btn-primary">📞 +91 75750 11974</a>
+              <a
+                href="https://wa.me/917575011974?text=Hi%2C%20I%27m%20interested%20in%20your%20Magento%20development%20services"
+                target="_blank" rel="noopener noreferrer"
+                className="cta-whatsapp"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '13px 28px', borderRadius: '50px', fontWeight: 600, fontSize: '0.95rem' }}
+              >
+                💬 WhatsApp Us
+              </a>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Contact Form & Info */}
-      <section className="contact-main section-padding">
+      {/* ── CONTACT GRID ──────────────────────────────────────── */}
+      <section className="section-pad">
         <div className="container">
-          <div className="contact-content">
-            {/* Contact Form */}
+          <div className="contact-grid">
+            {/* Info card */}
             <motion.div
+              className="contact-info-card"
               initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="contact-form-section"
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
             >
-              <h2>Send Us a Message</h2>
-              <form onSubmit={handleSubmit} className="contact-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="name">Full Name *</label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Your full name"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="email">Email Address *</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="phone">Phone Number</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="+1 (555) 123-4567"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="company">Company Name</label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      placeholder="Your company name"
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="service">Service Interested In</label>
-                  <select
-                    id="service"
-                    name="service"
-                    value={formData.service}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select a service</option>
-                    {services.map((service) => (
-                      <option key={service} value={service}>
-                        {service}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">Project Details *</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    rows="6"
-                    placeholder="Tell us about your project requirements, timeline, and any specific needs..."
-                  ></textarea>
-                </div>
-                {/* Status Message */}
-                {submitStatus && (
-                  <div className={`form-status ${submitStatus.type}`}>
-                    <p>{submitStatus.message}</p>
-                  </div>
-                )}
+              <h3>Contact Information</h3>
+              <p>We're a team of Magento experts based in Ahmedabad, India — serving clients across the globe.</p>
 
-                <button
-                  type="submit"
-                  className="btn-primary form-submit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
-              </form>
-            </motion.div>
-
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="contact-info-section"
-            >
-              <h2>Contact Information</h2>
-              <p className="contact-intro">
-                We're here to help and answer any questions you might have. 
-                We look forward to hearing from you.
-              </p>
-              
-              <div className="contact-info-grid">
-                {contactInfo.map((info, index) => (
-                  <div key={index} className="contact-info-item">
-                    <div className="contact-icon">{info.icon}</div>
-                    <div className="contact-details">
-                      <h3>{info.title}</h3>
-                      {info.link !== '#' ? (
-                        <a href={info.link}>{info.details}</a>
-                      ) : (
-                        <p>{info.details}</p>
-                      )}
+              <div className="contact-info-items">
+                {contactItems.map(c => (
+                  <div key={c.label} className="ci-item">
+                    <div className="ci-icon">{c.icon}</div>
+                    <div>
+                      <div className="ci-label">{c.label}</div>
+                      {c.href
+                        ? <div className="ci-value"><a href={c.href}>{c.value}</a></div>
+                        : <div className="ci-value">{c.value}</div>
+                      }
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Quick Response */}
-              <div className="quick-response">
-                <h3>Quick Response Guarantee</h3>
-                <p>
-                  We typically respond to all inquiries within 24 hours. 
-                  For urgent matters, please call us directly.
+              {/* WhatsApp CTA */}
+              <a
+                href="https://wa.me/917575011974?text=Hi%2C%20I%27m%20interested%20in%20Magento%20development"
+                target="_blank" rel="noopener noreferrer"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '16px 20px',
+                  background: 'rgba(37,211,102,0.08)',
+                  border: '1px solid rgba(37,211,102,0.25)',
+                  borderRadius: '14px',
+                  color: '#25D366',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  transition: 'all 0.25s',
+                  marginBottom: 24,
+                }}
+              >
+                <span style={{ fontSize: '1.3rem' }}>💬</span>
+                <div>
+                  <div>Chat on WhatsApp</div>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 400, color: 'var(--text-muted)' }}>Typically replies in minutes</div>
+                </div>
+              </a>
+
+              {/* Response guarantee */}
+              <div style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '14px',
+                padding: '18px 20px',
+              }}>
+                <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>
+                  ⚡ Fast Response Guarantee
+                </p>
+                <p style={{ fontSize: '0.82rem' }}>
+                  We respond to every inquiry within 24 business hours.
+                  For urgent projects, call us directly or WhatsApp.
                 </p>
               </div>
+            </motion.div>
 
-              {/* Social Links */}
-              <div className="contact-social">
-                <h3>Follow Us</h3>
-                <div className="social-links">
-                  <a href="#" className="social-link">LinkedIn</a>
-                  <a href="#" className="social-link">Twitter</a>
-                  <a href="#" className="social-link">GitHub</a>
-                  <a href="#" className="social-link">Facebook</a>
+            {/* Form */}
+            <motion.div
+              className="contact-form-card"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <h3>Send Us a Message</h3>
+              <p>Tell us about your project and we'll send you a detailed proposal.</p>
+
+              <form onSubmit={onSubmit} style={{ marginTop: 24 }}>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Full Name *</label>
+                    <input
+                      className="form-input"
+                      type="text" name="name" value={form.name}
+                      onChange={onChange} required placeholder="John Smith"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Email Address *</label>
+                    <input
+                      className="form-input"
+                      type="email" name="email" value={form.email}
+                      onChange={onChange} required placeholder="john@company.com"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Phone / WhatsApp</label>
+                    <input
+                      className="form-input"
+                      type="tel" name="phone" value={form.phone}
+                      onChange={onChange} placeholder="+1 555 000 0000"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Company Name</label>
+                    <input
+                      className="form-input"
+                      type="text" name="company" value={form.company}
+                      onChange={onChange} placeholder="Your Company"
+                    />
+                  </div>
+                  <div className="form-group full">
+                    <label className="form-label">Service Required *</label>
+                    <select
+                      className="form-select"
+                      name="service" value={form.service}
+                      onChange={onChange} required
+                    >
+                      <option value="">Select a service…</option>
+                      {serviceOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group full">
+                    <label className="form-label">Project Details *</label>
+                    <textarea
+                      className="form-textarea"
+                      name="message" value={form.message}
+                      onChange={onChange} required rows={5}
+                      placeholder="Tell us about your project — current platform, goals, timeline, and any specific requirements…"
+                    />
+                  </div>
                 </div>
-              </div>
+
+                {status && (
+                  <div className={`form-status ${status.type}`} style={{ marginTop: 16 }}>
+                    {status.msg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={loading}
+                  style={{ width: '100%', justifyContent: 'center', marginTop: 20, padding: '15px' }}
+                >
+                  {loading ? 'Sending…' : 'Send Message →'}
+                </button>
+              </form>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="contact-faq section-padding">
+      {/* ── FAQ ──────────────────────────────────────────────── */}
+      <section className="section-pad" style={{ background: 'rgba(255,255,255,0.015)' }}>
         <div className="container">
-          <div className="section-header text-center">
-            <h2>Frequently Asked Questions</h2>
-            <p>Quick answers to common questions</p>
-          </div>
-          <div className="faq-grid">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="faq-item"
-            >
-              <h3>How long does a typical project take?</h3>
-              <p>
-                Project timelines vary based on complexity and requirements. 
-                Simple websites typically take 2-4 weeks, while complex applications 
-                can take 2-6 months. We'll provide a detailed timeline during consultation.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="faq-item"
-            >
-              <h3>Do you provide ongoing support?</h3>
-              <p>
-                Yes, we offer comprehensive support and maintenance packages 
-                to ensure your application continues to perform optimally after launch.
-              </p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="faq-item"
-            >
-              <h3>What is your development process?</h3>
-              <p>
-                We follow an agile methodology with regular client communication, 
-                including discovery, planning, development, testing, and deployment phases.
-              </p>
-            </motion.div>
-          </div>
+          <motion.div
+            className="text-center"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          >
+            <motion.span variants={fadeUp} className="eyebrow">FAQs</motion.span>
+            <motion.h2 variants={fadeUp}>Frequently Asked Questions</motion.h2>
+          </motion.div>
+          <motion.div
+            className="faq-list"
+            style={{ maxWidth: 800, margin: '0 auto' }}
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          >
+            {faqs.map(f => (
+              <motion.div key={f.q} className="faq-item" variants={fadeUp}>
+                <h4>{f.q}</h4>
+                <p>{f.a}</p>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
     </div>

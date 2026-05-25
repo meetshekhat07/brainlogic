@@ -1,279 +1,329 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+
+const projects = [
+  {
+    id: 1,
+    category: 'magento',
+    label: 'Magento',
+    title: 'Fashion eCommerce — Full Magento 2 Build',
+    desc: 'Custom Magento 2 store for a UK-based fashion brand with Hyvä theme, Stripe payments, and real-time inventory sync to SAP.',
+    tech: ['Magento 2', 'Hyvä', 'PHP 8', 'Stripe', 'SAP ERP'],
+    icon: '🛒', color: 'c-orange',
+    result: '+38% conversion rate after launch',
+  },
+  {
+    id: 2,
+    category: 'magento',
+    label: 'Magento',
+    title: 'B2B Adobe Commerce — Manufacturing Portal',
+    desc: 'Adobe Commerce B2B implementation with company accounts, custom pricing tiers, and quote management for a US manufacturer.',
+    tech: ['Adobe Commerce', 'B2B Module', 'GraphQL', 'MySQL 8'],
+    icon: '🏭', color: 'c-orange',
+    result: '120+ B2B clients onboarded in Month 1',
+  },
+  {
+    id: 3,
+    category: 'magento',
+    label: 'Magento',
+    title: 'M1 → M2 Migration — Health & Beauty Brand',
+    desc: 'Zero-downtime Magento 1 to Magento 2.4 migration preserving all orders, customers, SEO rankings, and custom functionality.',
+    tech: ['Magento 2.4', 'Data Migration', 'Redis', 'Varnish'],
+    icon: '💄', color: 'c-green',
+    result: 'Zero data loss. PageSpeed: 45 → 92',
+  },
+  {
+    id: 4,
+    category: 'react',
+    label: 'React',
+    title: 'Real-Time Analytics Dashboard',
+    desc: 'Executive-level analytics SaaS dashboard with React 18, WebSockets for live data, and export to PDF/Excel.',
+    tech: ['React 18', 'TypeScript', 'WebSocket', 'D3.js', 'Node.js'],
+    icon: '📊', color: 'c-cyan',
+    result: 'Used by 300+ enterprise users daily',
+  },
+  {
+    id: 5,
+    category: 'react',
+    label: 'React',
+    title: 'Headless Magento PWA Storefront',
+    desc: 'Lightning-fast PWA storefront built with React + Magento PWA Studio for an Australian grocery chain.',
+    tech: ['React', 'Magento PWA Studio', 'GraphQL', 'Service Worker'],
+    icon: '📱', color: 'c-cyan',
+    result: '2.1s LCP. 40% mobile checkout lift',
+  },
+  {
+    id: 6,
+    category: 'angular',
+    label: 'Angular',
+    title: 'B2B Order Management Portal',
+    desc: 'Angular 17 enterprise portal connecting 500+ distributors with real-time order tracking, invoicing, and credit management.',
+    tech: ['Angular 17', 'RxJS', 'Spring Boot', 'PostgreSQL'],
+    icon: '📋', color: 'c-purple',
+    result: 'Reduced order processing time by 65%',
+  },
+  {
+    id: 7,
+    category: 'uiux',
+    label: 'UI/UX',
+    title: 'eCommerce UX Redesign — 40% CRO Uplift',
+    desc: 'Complete UX audit and redesign for a European electronics retailer. A/B tested checkout flow reduced cart abandonment by 40%.',
+    tech: ['Figma', 'User Research', 'A/B Testing', 'Hotjar'],
+    icon: '🎨', color: 'c-pink',
+    result: 'Cart abandonment: 72% → 43%',
+  },
+  {
+    id: 8,
+    category: 'uiux',
+    label: 'UI/UX',
+    title: 'SaaS Design System & Brand Identity',
+    desc: 'Full design system with 200+ components, tokens, and Figma library for a fast-growing Indian SaaS startup.',
+    tech: ['Figma', 'Design Tokens', 'Storybook', 'Lottie'],
+    icon: '🖥️', color: 'c-pink',
+    result: 'Cut design-to-dev time by 55%',
+  },
+  {
+    id: 9,
+    category: 'java',
+    label: 'Java',
+    title: 'Microservices ERP — Logistics Platform',
+    desc: 'Spring Boot microservices ERP for a logistics firm handling 10,000+ daily shipments with Kafka event streaming.',
+    tech: ['Spring Boot', 'Kafka', 'Docker', 'PostgreSQL', 'Redis'],
+    icon: '🚚', color: 'c-green',
+    result: '99.98% uptime over 18 months',
+  },
+  {
+    id: 10,
+    category: 'python',
+    label: 'Python',
+    title: 'AI Product Recommendation Engine',
+    desc: 'ML-powered product recommendation engine integrated into Magento, increasing average order value by 28%.',
+    tech: ['Python', 'TensorFlow', 'FastAPI', 'Magento API', 'Redis'],
+    icon: '🤖', color: 'c-cyan',
+    result: 'AOV increased by 28% in 3 months',
+  },
+];
+
+const filters = [
+  { key: 'all',     label: 'All Projects' },
+  { key: 'magento', label: '🛒 Magento' },
+  { key: 'react',   label: '⚛️ React' },
+  { key: 'angular', label: '⚡ Angular' },
+  { key: 'uiux',    label: '🎨 UI/UX' },
+  { key: 'java',    label: '☕ Java' },
+  { key: 'python',  label: '🐍 Python' },
+];
+
+const testimonials = [
+  {
+    stars: '★★★★★',
+    quote: 'Brain Logic delivered our Magento 2 store on time and within budget. The Hyvä theme they built is blazing fast and our conversion rate jumped 38% within 30 days.',
+    name: 'Daniel Harrison',
+    role: 'Head of eCommerce, StyleHub UK',
+    initials: 'DH',
+  },
+  {
+    stars: '★★★★★',
+    quote: 'The M1 to M2 migration was flawless — zero downtime, all our SEO preserved, and our PageSpeed went from 45 to 92. Absolutely outstanding team.',
+    name: 'Priya Kapoor',
+    role: 'Founder, WellnessFirst India',
+    initials: 'PK',
+  },
+  {
+    stars: '★★★★★',
+    quote: 'Our B2B portal in Angular is exactly what we envisioned. The code quality is excellent, communication was daily, and they handled our complex pricing rules perfectly.',
+    name: 'Mark Thompson',
+    role: 'CTO, IndustrialHub USA',
+    initials: 'MT',
+  },
+];
 
 const Portfolio = () => {
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [active, setActive] = useState('all');
 
-  const projects = [
-    {
-      id: 1,
-      title: 'E-Commerce Platform',
-      category: 'magento',
-      description: 'Custom Magento 2 store with advanced features and integrations',
-      technologies: ['Magento 2', 'PHP', 'MySQL', 'Redis'],
-      image: '🛒',
-      link: '#'
-    },
-    {
-      id: 2,
-      title: 'Corporate Dashboard',
-      category: 'react',
-      description: 'Real-time analytics dashboard built with React and D3.js',
-      technologies: ['React', 'TypeScript', 'D3.js', 'Node.js'],
-      image: '📊',
-      link: '#'
-    },
-    {
-      id: 3,
-      title: 'E-Commerce UI/UX Redesign',
-      category: 'uiux',
-      description: 'Complete UI/UX redesign for e-commerce platform increasing conversions by 40%',
-      technologies: ['Figma', 'User Research', 'Prototyping', 'A/B Testing'],
-      image: '🎨',
-      link: '#'
-    },
-    {
-      id: 4,
-      title: 'Learning Management System',
-      category: 'java',
-      description: 'Comprehensive LMS built with Spring Boot and React',
-      technologies: ['Java', 'Spring Boot', 'React', 'PostgreSQL'],
-      image: '📚',
-      link: '#'
-    },
-    {
-      id: 5,
-      title: 'AI-Powered Analytics',
-      category: 'python',
-      description: 'Machine learning platform for business intelligence',
-      technologies: ['Python', 'Django', 'TensorFlow', 'PostgreSQL'],
-      image: '🤖',
-      link: '#'
-    },
-    {
-      id: 6,
-      title: 'Project Management Tool',
-      category: 'angular',
-      description: 'Collaborative project management application',
-      technologies: ['Angular', 'Node.js', 'MongoDB', 'Socket.io'],
-      image: '📋',
-      link: '#'
-    },
-    {
-      id: 7,
-      title: 'Healthcare Portal',
-      category: 'react',
-      description: 'Patient management system with telemedicine features',
-      technologies: ['React', 'Node.js', 'MongoDB', 'WebRTC'],
-      image: '🏥',
-      link: '#'
-    },
-    {
-      id: 8,
-      title: 'Mobile App UI Design',
-      category: 'uiux',
-      description: 'Modern mobile app interface design with intuitive user experience',
-      technologies: ['Adobe XD', 'Sketch', 'InVision', 'User Testing'],
-      image: '📱',
-      link: '#'
-    }
-  ];
-
-  const filters = [
-    { key: 'all', label: 'All Projects' },
-    { key: 'react', label: 'React' },
-    { key: 'angular', label: 'Angular' },
-    { key: 'magento', label: 'Magento' },
-    { key: 'uiux', label: 'UI/UX' },
-    { key: 'java', label: 'Java' },
-    { key: 'python', label: 'Python' }
-  ];
-
-  const filteredProjects = activeFilter === 'all' 
-    ? projects 
-    : projects.filter(project => project.category === activeFilter);
+  const filtered = active === 'all'
+    ? projects
+    : projects.filter(p => p.category === active);
 
   return (
-    <div className="portfolio">
-      {/* Hero Section */}
-      <section className="portfolio-hero section-padding">
-        <div className="container">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="portfolio-hero-content text-center"
-          >
-            <h1>Our <span className="gradient-text">Portfolio</span></h1>
-            <p className="hero-description">
-              Explore our successful projects and see how we've helped businesses 
-              transform their digital presence with innovative solutions.
-            </p>
+    <div>
+      {/* ── HERO ───────────────────────────────────────────────── */}
+      <section className="page-hero">
+        <div className="container page-hero-inner">
+          <motion.div initial="hidden" animate="show" variants={stagger} className="text-center">
+            <motion.span variants={fadeUp} className="eyebrow">Our Work</motion.span>
+            <motion.h1 variants={fadeUp}>
+              Real Projects, <span className="gradient-text">Real Results</span>
+            </motion.h1>
+            <motion.p variants={fadeUp} style={{ maxWidth: 580, margin: '16px auto 0', fontSize: '1.05rem' }}>
+              100+ projects delivered across Magento, React, Angular, UI/UX and more —
+              serving clients in 15+ countries with measurable business outcomes.
+            </motion.p>
           </motion.div>
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="portfolio-filters">
+      {/* ── STATS ─────────────────────────────────────────────── */}
+      <div className="stats-section">
         <div className="container">
-          <div className="filter-buttons">
-            {filters.map((filter) => (
+          <motion.div
+            className="stats-grid"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          >
+            {[
+              { num: '100+', label: 'Projects Delivered' },
+              { num: '50+',  label: 'Happy Clients' },
+              { num: '15+',  label: 'Countries Served' },
+              { num: '98%',  label: 'Client Retention' },
+            ].map(s => (
+              <motion.div key={s.label} className="stat-box" variants={fadeUp}>
+                <span className="stat-num">{s.num}</span>
+                <span className="stat-label">{s.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ── PROJECTS ───────────────────────────────────────────── */}
+      <section className="section-pad">
+        <div className="container">
+          <motion.div
+            className="text-center"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+            style={{ marginBottom: 40 }}
+          >
+            <motion.span variants={fadeUp} className="eyebrow">Case Studies</motion.span>
+            <motion.h2 variants={fadeUp}>Featured Projects</motion.h2>
+          </motion.div>
+
+          {/* Filters */}
+          <div className="filter-bar">
+            {filters.map(f => (
               <button
-                key={filter.key}
-                onClick={() => setActiveFilter(filter.key)}
-                className={`filter-btn ${activeFilter === filter.key ? 'active' : ''}`}
+                key={f.key}
+                className={`filter-btn ${active === f.key ? 'active' : ''}`}
+                onClick={() => setActive(f.key)}
               >
-                {filter.label}
+                {f.label}
               </button>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Projects Grid */}
-      <section className="portfolio-grid section-padding">
-        <div className="container">
-          <div className="projects-grid">
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="project-card"
-              >
-                <div className="project-image">
-                  <span className="project-icon">{project.image}</span>
-                </div>
-                <div className="project-content">
-                  <h3>{project.title}</h3>
-                  <p>{project.description}</p>
-                  <div className="project-technologies">
-                    {project.technologies.map((tech, idx) => (
-                      <span key={idx} className="tech-tag">{tech}</span>
-                    ))}
-                  </div>
-                  <a href={project.link} className="project-link">
-                    View Project →
-                  </a>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="portfolio-stats section-padding">
-        <div className="container">
-          <div className="stats-grid">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="stat-item"
-            >
-              <div className="stat-number gradient-text">100+</div>
-              <div className="stat-label">Projects Completed</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="stat-item"
-            >
-              <div className="stat-number gradient-text">50+</div>
-              <div className="stat-label">Happy Clients</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="stat-item"
-            >
-              <div className="stat-number gradient-text">98%</div>
-              <div className="stat-label">Success Rate</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="stat-item"
-            >
-              <div className="stat-number gradient-text">24/7</div>
-              <div className="stat-label">Support Available</div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="portfolio-testimonials section-padding">
-        <div className="container">
-          <div className="section-header text-center">
-            <h2>What Our Clients Say</h2>
-            <p>Real feedback from our satisfied clients</p>
-          </div>
-          <div className="testimonials-grid">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="testimonial-card"
-            >
-              <p>
-                "Brain Logic delivered an exceptional e-commerce platform that exceeded our expectations. 
-                Their attention to detail and technical expertise is outstanding."
-              </p>
-              <div className="testimonial-author">
-                <strong>Sarah Johnson</strong>
-                <span>CEO, TechStore Inc.</span>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="testimonial-card"
-            >
-              <p>
-                "The React dashboard they built for us has transformed how we analyze our business data. 
-                Highly professional team with excellent communication."
-              </p>
-              <div className="testimonial-author">
-                <strong>Michael Chen</strong>
-                <span>CTO, DataViz Solutions</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="portfolio-cta section-padding">
-        <div className="container">
+          {/* Grid */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="cta-content text-center"
+            className="portfolio-grid-4"
+            layout
           >
-            <h2>Ready to Start Your Project?</h2>
-            <p>
-              Join our list of satisfied clients and let us help you build 
-              something amazing for your business.
-            </p>
-            <div className="cta-buttons">
-              <a href="/contact" className="btn-primary">
-                Get Started Today
-              </a>
-              <a href="/services" className="btn-secondary">
-                View Our Services
-              </a>
-            </div>
+            <AnimatePresence mode="popLayout">
+              {filtered.map(p => (
+                <motion.div
+                  key={p.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                  className="project-card"
+                >
+                  <div className={`project-thumb ${p.color}`}>
+                    {p.icon}
+                  </div>
+                  <div className="project-info">
+                    <span className="project-category">{p.label}</span>
+                    <h4>{p.title}</h4>
+                    <p>{p.desc}</p>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '8px 12px',
+                      background: 'rgba(249,115,22,0.08)',
+                      border: '1px solid rgba(249,115,22,0.18)',
+                      borderRadius: 8,
+                      marginTop: 4,
+                    }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--orange)', fontWeight: 700 }}>📈 RESULT</span>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--orange-light)', fontWeight: 600 }}>{p.result}</span>
+                    </div>
+                    <div className="project-tags" style={{ marginTop: 12 }}>
+                      {p.tech.map(t => (
+                        <span key={t} className="project-tag">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="project-link-row">
+                    <a href="/contact">Discuss Similar Project →</a>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </motion.div>
         </div>
       </section>
+
+      {/* ── TESTIMONIALS ───────────────────────────────────────── */}
+      <section className="section-pad" style={{ background: 'rgba(255,255,255,0.015)' }}>
+        <div className="container">
+          <motion.div
+            className="text-center"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+            style={{ marginBottom: 48 }}
+          >
+            <motion.span variants={fadeUp} className="eyebrow">Client Feedback</motion.span>
+            <motion.h2 variants={fadeUp}>What Our Clients Say</motion.h2>
+          </motion.div>
+
+          <motion.div
+            className="testimonials-grid"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}
+          >
+            {testimonials.map(t => (
+              <motion.div key={t.name} className="testimonial-card" variants={fadeUp}>
+                <div className="testimonial-stars">{t.stars}</div>
+                <p className="testimonial-quote">"{t.quote}"</p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">{t.initials}</div>
+                  <div>
+                    <div className="author-name">{t.name}</div>
+                    <div className="author-role">{t.role}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── CTA ────────────────────────────────────────────────── */}
+      <div className="container">
+        <motion.div
+          className="cta-section"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="cta-inner">
+            <span className="eyebrow" style={{ justifyContent: 'center' }}>Start Your Project</span>
+            <h2>Ready to Build Your <span className="gradient-text">Success Story</span>?</h2>
+            <p>Join 50+ businesses worldwide that trust Brain Logic for their digital growth.</p>
+            <div className="cta-actions">
+              <Link to="/contact" className="btn-primary">Get Free Consultation →</Link>
+              <a href="https://wa.me/917575011974" target="_blank" rel="noopener noreferrer" className="cta-whatsapp">
+                💬 WhatsApp Us
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
