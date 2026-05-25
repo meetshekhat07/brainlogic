@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
+import SEOMeta from '../components/SEOMeta';
 
 /* ─── Animated Counter ────────────────────────────────────────── */
 const Counter = ({ target, suffix = '' }) => {
@@ -126,6 +127,12 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 /* ═══════════════════════════════════════════════════════════════ */
 const Home = () => (
   <div>
+    <SEOMeta
+      title="Magento 2 & eCommerce Development Company – Ahmedabad"
+      description="Brain Logic Info Solutions — Expert Magento 2, Adobe Commerce, React & Angular development in Ahmedabad, India. 100+ projects, 50+ clients, 15+ countries. Get a free quote today."
+      keywords="Magento development company Ahmedabad, Magento 2 developer India, Adobe Commerce Ahmedabad, eCommerce development India, Hyvä theme developer, React development Ahmedabad"
+      canonical="/"
+    />
 
     {/* ── HERO ─────────────────────────────────────────────────── */}
     <section className="hero-section">

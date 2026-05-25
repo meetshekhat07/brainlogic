@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SEOMeta from '../components/SEOMeta';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -134,6 +135,12 @@ const processSteps = [
 
 const Services = () => (
   <div>
+    <SEOMeta
+      title="Magento, React, Angular & UI/UX Development Services"
+      description="Full-stack eCommerce & web development services: Magento 2, Adobe Commerce, React, Angular, UI/UX Design, Java, Python. Expert team in Ahmedabad, India serving global clients."
+      keywords="Magento 2 development services, Adobe Commerce developer, React development services India, Angular development, UI UX design Ahmedabad, Java development India, Python AI development"
+      canonical="/services"
+    />
     {/* ── HERO ─────────────────────────────────────────────────── */}
     <section className="page-hero">
       <div className="container page-hero-inner">

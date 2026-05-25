@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SEOMeta from '../components/SEOMeta';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -47,6 +48,12 @@ const benefits = [
 
 const About = () => (
   <div>
+    <SEOMeta
+      title="About Us — Magento & eCommerce Development Team"
+      description="Brain Logic Info Solutions — Ahmedabad-based eCommerce development agency. Learn about our team, mission, and why 50+ global clients trust us for Magento 2 and web development."
+      keywords="about Brain Logic Info Solutions, Magento development team Ahmedabad, eCommerce agency India, web development company Gujarat"
+      canonical="/about"
+    />
     {/* ── HERO ─────────────────────────────────────────────────── */}
     <section className="page-hero">
       <div className="container page-hero-inner">

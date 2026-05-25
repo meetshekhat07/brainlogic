@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import SEOMeta from '../components/SEOMeta';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -101,6 +102,12 @@ const Contact = () => {
 
   return (
     <div>
+      <SEOMeta
+        title="Contact Us — Get a Free Magento & eCommerce Quote"
+        description="Contact Brain Logic Info Solutions for a free Magento 2 development consultation. Based in Ahmedabad, India. WhatsApp, call or email — we respond within 2 hours."
+        keywords="contact Brain Logic, Magento developer contact Ahmedabad, hire Magento developer India, eCommerce development quote India, web development inquiry"
+        canonical="/contact"
+      />
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section className="page-hero">
         <div className="container page-hero-inner">
